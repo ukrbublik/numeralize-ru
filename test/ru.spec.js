@@ -1,7 +1,7 @@
 const assert = require('assert');
 const numeralize = require('../index');
 
-describe('numeralize', () => {
+describe('numeralize (ru)', () => {
     'use strict';
 
     const tests = [
@@ -1063,7 +1063,8 @@ describe('numeralize', () => {
                                         arg0,
                                         numeralize[arg1],
                                         numeralize[arg2],
-                                        arg3
+                                        arg3,
+                                        'ru'
                                     ),
                                     expected
                                 );

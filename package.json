@@ -1,7 +1,7 @@
 {
-  "name": "numeralize-ru",
-  "version": "1.0.1",
-  "description": "Russian numerals",
+  "name": "numeralize-rus-ukr",
+  "version": "1.0.2",
+  "description": "Converts a number to words for Russian/Ukrainian languages. Написание числительных на русском языке с учётом пола и падежа.",
   "main": "index.js",
   "scripts": {
     "test": "npm run test:js; npm run test:ts",
@@ -11,6 +11,7 @@
   },
   "keywords": [
     "russian",
+    "ukrainian",
     "language",
     "number",
     "numeral",
@@ -21,6 +22,9 @@
     "ru"
   ],
   "author": "anotherpit <anotherpit@gmail.com>",
+  "contributors": [
+    "ukrbubik <ukrbubik@gmail.com>"
+  ],
   "license": "MIT",
   "devDependencies": {
     "mocha": "^2.4.5",
@@ -28,6 +32,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/anotherpit/numeralize-ru.git"
+    "url": "https://github.com/ukrbublik/numeralize-rus-ukr.git"
   }
 }
