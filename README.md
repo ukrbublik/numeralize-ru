@@ -10,7 +10,7 @@ npm install --save numeralize-rus-ukr
 
 # API
 
-### `numeralize(number, lang, [gender, [kase, [animate]]])`
+### `numeralize(number, [lang, [gender, [kase, [animate]]]])`
 
 Возвращает числительное, соответствующее числу
 
