@@ -14,6 +14,6 @@ c = numeralize.CASE_INSTRUMENTAL;
 c = numeralize.CASE_PREPOSITIONAL;
 
 let s: string;
-s = numeralize(123, g, c, true);
+s = numeralize(123, 'ru', g, c, true);
 s = numeralize.pluralize(123, 'рубль', 'рубля', 'рублей');
 

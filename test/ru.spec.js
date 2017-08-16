@@ -1061,10 +1061,10 @@ describe('numeralize (ru)', () => {
                                 assert.strictEqual(
                                     numeralize(
                                         arg0,
+                                        'ru',
                                         numeralize[arg1],
                                         numeralize[arg2],
-                                        arg3,
-                                        'ru'
+                                        arg3
                                     ),
                                     expected
                                 );

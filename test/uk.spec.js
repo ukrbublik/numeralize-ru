@@ -1,7 +1,7 @@
 const assert = require('assert');
 const numeralize = require('../index');
 
-describe('numeralize (ru)', () => {
+describe('numeralize (uk)', () => {
     'use strict';
 
     const tests = [
@@ -37,10 +37,10 @@ describe('numeralize (ru)', () => {
                                 assert.strictEqual(
                                     numeralize(
                                         arg0,
+                                        'uk',
                                         numeralize[arg1],
                                         numeralize[arg2],
-                                        arg3,
-                                        'uk'
+                                        arg3
                                     ),
                                     expected
                                 );

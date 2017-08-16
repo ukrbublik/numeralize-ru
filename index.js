@@ -9,16 +9,30 @@
 }(this, function() {
     'use strict';
 
+    var genders = {
+        'GENDER_MASCULINE': 0,
+        'GENDER_FEMININE': 1,
+        'GENDER_NEUTER': 2,
+    };
+    var kases = {
+        'CASE_NOMINATIVE': 0,
+        'CASE_GENITIVE': 1,
+        'CASE_DATIVE': 2,
+        'CASE_ACCUSATIVE': 3,
+        'CASE_INSTRUMENTAL': 4,
+        'CASE_PREPOSITIONAL': 5,
+    };
+
     /**
      * Numeralize number
      * @param {number} number Integer
+     * @param {string} lang 'ru'/'uk'
      * @param {number} [gender=numeralize.GENDER_MASCULINE]
      * @param {number} [kase=numeralize.CASE_NOMINATIVE]
      * @param {boolean} [animate=false]
-     * @param {string} lang 'ru'/'uk'
      * @returns {string}
      */
-    function numeralize(number, gender, kase, animate, lang = 'ru') {
+    function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase = kase.CASE_NOMINATIVE, animate = false) {
         // Normalize params
         number = Math.abs(parseInt(number, 10));
         gender = gender || numeralize.GENDER_MASCULINE;
@@ -39,7 +53,7 @@
 
             if (current) {
                 var words = i ? CONFIG.LARGES[i] : null;
-                var numeral = small(current, words ? words[0] : gender, kase, words ? false : animate, lang);
+                var numeral = small(current, lang, words ? words[0] : gender, kase, words ? false : animate);
                 if (numeral) {
                     result.push(numeral);
                     if (words) {
@@ -63,13 +77,13 @@
      * Numeralize small number (< 1000)
      * @private
      * @param {number} number Non-negative integer < 1000
+     * @param {string} lang 'ru'/'uk'
      * @param {number} gender
      * @param {number} kase
      * @param {boolean} animate
-     * @param {string} lang 'ru'/'uk'
      * @returns {string}
      */
-    function small(number, gender, kase, animate, lang = 'ru') {
+    function small(number, lang, gender, kase, animate) {
         if (!I18N[lang])
             lang = 'ru';
         var CONFIG = I18N[lang];
@@ -139,18 +153,17 @@
         return five;
     }
 
-    numeralize.GENDER_MASCULINE = 0;
-    numeralize.GENDER_FEMININE = 1;
-    numeralize.GENDER_NEUTER = 2;
-
-    numeralize.CASE_NOMINATIVE = 0;
-    numeralize.CASE_GENITIVE = 1;
-    numeralize.CASE_DATIVE = 2;
-    numeralize.CASE_ACCUSATIVE = 3;
-    numeralize.CASE_INSTRUMENTAL = 4;
-    numeralize.CASE_PREPOSITIONAL = 5;
-
     numeralize.pluralize = pluralize;
+
+    numeralize.genders = genders;
+    for(let k in genders) {
+        numeralize[k] = genders[k];
+    }
+
+    numeralize.kases = kases;
+    for(let k in kases) {
+        numeralize[k] = kases[k];
+    }
 
     var I18N = {};
 

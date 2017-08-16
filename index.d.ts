@@ -1,6 +1,6 @@
 export = numeralize;
 
-declare function numeralize(number: number, gender?: numeralize.Gender, kase?: numeralize.Case, animate?: boolean): string;
+declare function numeralize(number: number, lang: string, gender?: numeralize.Gender, kase?: numeralize.Case, animate?: boolean): string;
 
 declare namespace numeralize {
     export type Gender = number;
