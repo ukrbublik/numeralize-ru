@@ -1,448 +1,216 @@
-;(function(root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define([], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory();
-    } else {
-        root.numeralize = factory();
-    }
-}(this, function() {
-    'use strict';
+'use strict';
 
-    var genders = {
-        'GENDER_MASCULINE': 0,
-        'GENDER_FEMININE': 1,
-        'GENDER_NEUTER': 2,
-    };
-    var kases = {
-        'CASE_NOMINATIVE': 0,
-        'CASE_GENITIVE': 1,
-        'CASE_DATIVE': 2,
-        'CASE_ACCUSATIVE': 3,
-        'CASE_INSTRUMENTAL': 4,
-        'CASE_PREPOSITIONAL': 5,
-    };
+import I18N from './i18n/ubdex.js';
 
-    /**
-     * Numeralize number
-     * @param {number} number Integer
-     * @param {string} lang 'ru'/'uk'
-     * @param {number} [gender=numeralize.GENDER_MASCULINE]
-     * @param {number} [kase=numeralize.CASE_NOMINATIVE]
-     * @param {boolean} [animate=false]
-     * @returns {string}
-     */
-    function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase = kase.CASE_NOMINATIVE, animate = false) {
-        // Normalize params
-        number = Math.abs(parseInt(number, 10));
-        gender = gender || numeralize.GENDER_MASCULINE;
-        kase = kase || numeralize.CASE_NOMINATIVE;
-        animate = !!animate;
-        if (!I18N[lang])
-            lang = 'ru';
-        var CONFIG = I18N[lang];
+var genders = {
+    'GENDER_MASCULINE': 0,
+    'GENDER_FEMININE': 1,
+    'GENDER_NEUTER': 2,
+};
+var kases = {
+    'CASE_NOMINATIVE': 0,
+    'CASE_GENITIVE': 1,
+    'CASE_DATIVE': 2,
+    'CASE_ACCUSATIVE': 3,
+    'CASE_INSTRUMENTAL': 4,
+    'CASE_PREPOSITIONAL': 5,
+};
 
-        // Collect chunks
-        var result = [];
+/**
+ * Numeralize number
+ * @param {number} number Integer
+ * @param {string} lang 'ru'/'uk'
+ * @param {number} [gender=numeralize.GENDER_MASCULINE]
+ * @param {number} [kase=numeralize.CASE_NOMINATIVE]
+ * @param {boolean} [animate=false]
+ * @returns {string}
+ */
+function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase = kase.CASE_NOMINATIVE, animate = false) {
+    // Normalize params
+    number = Math.abs(parseInt(number, 10));
+    gender = gender || numeralize.GENDER_MASCULINE;
+    kase = kase || numeralize.CASE_NOMINATIVE;
+    animate = !!animate;
+    if (!I18N[lang])
+        lang = 'ru';
+    var CONFIG = I18N[lang];
 
-        // Descend known powers of thousand
-        for (var l = CONFIG.LARGES.length, i = l; i >= 0; i--) {
-            var base = Math.pow(10, i * 3);
-            var current = Math.floor(number / base);
-            number = number % base;
+    // Collect chunks
+    var result = [];
 
-            if (current) {
-                var words = i ? CONFIG.LARGES[i] : null;
-                var numeral = small(current, lang, words ? words[0] : gender, kase, words ? false : animate);
-                if (numeral) {
-                    result.push(numeral);
-                    if (words) {
-                        var plural = pluralize.apply(null, [current].concat(words[kase + 1]));
-                        result.push(plural);
-                    }
+    // Descend known powers of thousand
+    for (var l = CONFIG.LARGES.length, i = l; i >= 0; i--) {
+        var base = Math.pow(10, i * 3);
+        var current = Math.floor(number / base);
+        number = number % base;
+
+        if (current) {
+            var words = i ? CONFIG.LARGES[i] : null;
+            var numeral = small(current, lang, words ? words[0] : gender, kase, words ? false : animate);
+            if (numeral) {
+                result.push(numeral);
+                if (words) {
+                    var plural = pluralize.apply(null, [current].concat(words[kase + 1]));
+                    result.push(plural);
                 }
             }
         }
-
-        // Zero
-        if (!result.length) {
-            return CONFIG.MINORS[0][kase];
-        }
-
-        // Return
-        return result.join(" ");
     }
 
-    /**
-     * Numeralize small number (< 1000)
-     * @private
-     * @param {number} number Non-negative integer < 1000
-     * @param {string} lang 'ru'/'uk'
-     * @param {number} gender
-     * @param {number} kase
-     * @param {boolean} animate
-     * @returns {string}
-     */
-    function small(number, lang, gender, kase, animate) {
-        if (!I18N[lang])
-            lang = 'ru';
-        var CONFIG = I18N[lang];
+    // Zero
+    if (!result.length) {
+        return CONFIG.MINORS[0][kase];
+    }
 
-        // Zero
-        if (0 === number) { return ""; }
+    // Return
+    return result.join(" ");
+}
 
-        // Collect chunks
-        var result = [];
+/**
+ * Numeralize small number (< 1000)
+ * @private
+ * @param {number} number Non-negative integer < 1000
+ * @param {string} lang 'ru'/'uk'
+ * @param {number} gender
+ * @param {number} kase
+ * @param {boolean} animate
+ * @returns {string}
+ */
+function small(number, lang, gender, kase, animate) {
+    if (!I18N[lang])
+        lang = 'ru';
+    var CONFIG = I18N[lang];
 
-        // Hundreds
-        var hundreds = Math.floor(number / 100);
-        if (CONFIG.HUNDREDS[hundreds]) {
-            hundreds = CONFIG.HUNDREDS[hundreds][kase];
-            if ("string" !== typeof hundreds) {
-                hundreds = hundreds[animate ? 0 : 1];
-            }
-            result.push(hundreds);
+    // Zero
+    if (0 === number) { return ""; }
+
+    // Collect chunks
+    var result = [];
+
+    // Hundreds
+    var hundreds = Math.floor(number / 100);
+    if (CONFIG.HUNDREDS[hundreds]) {
+        hundreds = CONFIG.HUNDREDS[hundreds][kase];
+        if ("string" !== typeof hundreds) {
+            hundreds = hundreds[animate ? 0 : 1];
         }
+        result.push(hundreds);
+    }
 
-        // Tens
-        var tens = Math.floor(number % 100 / 10);
-        if (CONFIG.TENS[tens]) {
-            tens = CONFIG.TENS[tens][kase];
-            if ("string" !== typeof tens) {
-                tens = tens[animate ? 0 : 1];
-            }
-            result.push(tens);
+    // Tens
+    var tens = Math.floor(number % 100 / 10);
+    if (CONFIG.TENS[tens]) {
+        tens = CONFIG.TENS[tens][kase];
+        if ("string" !== typeof tens) {
+            tens = tens[animate ? 0 : 1];
         }
+        result.push(tens);
+    }
 
-        // Minors
-        var minors = number % 100;
-        if (minors >= CONFIG.MINORS.length) {
-            minors = number % 10;
-        }
-        if (minors) {
-            minors = CONFIG.MINORS[minors][kase];
+    // Minors
+    var minors = number % 100;
+    if (minors >= CONFIG.MINORS.length) {
+        minors = number % 10;
+    }
+    if (minors) {
+        minors = CONFIG.MINORS[minors][kase];
+        if ("string" !== typeof minors) {
+            minors = minors[gender];
             if ("string" !== typeof minors) {
-                minors = minors[gender];
-                if ("string" !== typeof minors) {
-                    minors = minors[animate ? 0 : 1];
-                }
+                minors = minors[animate ? 0 : 1];
             }
-            result.push(minors);
         }
-
-        // Return
-        return result.join(" ");
+        result.push(minors);
     }
 
-    /**
-     * Pluralize noun according to count
-     * @param {number} count Number of items
-     * @param {string} one E.g. «рубль»
-     * @param {string} two E.g. «рубля»
-     * @param {string} five E.g. «рублей»
-     * @returns {string}
-     */
-    function pluralize(count, one, two, five) {
-        count = Math.floor(Math.abs(count)) % 100;
-        if (count > 10 && count < 20) {
-            return five;
+    // Return
+    return result.join(" ");
+}
+
+/**
+ * Pluralize noun (unit) according to count
+ * @param {number} count Number of items
+ * @param {array} 3 forms, e.g. ['рубль', 'рубля', 'рублей']
+ * @returns {string}
+ */
+function pluralizeUnit(count, forms) {
+    return forms[getFormForNumber(count)];
+}
+
+/**
+ * Get 1 of 3 forms depending on count
+ * @param {number} count Number of items
+ * @returns {number} 0/1/2
+ */
+function getFormForNumber(count) {
+    count = Math.floor(Math.abs(count)) % 100;
+    if (count > 10 && count < 20) {
+        return 2;
+    }
+    count = count % 10;
+    if (1 === count) { return 0; }
+    if (count >= 2 && count <= 4) { return 1; }
+    return 2;
+}
+
+/**
+ * Incline noun according to count
+ * @param {number} count Number of items
+ * @param {array} forms [[6 words for every case in singular], [6 words for every case in plural]]
+ * @param {string} lang 'ru'/'uk'
+ * @param {number} kase
+ * @returns {string}
+ */
+function inclineUnit(count, forms, lang = 'ru', kase = kase.CASE_NOMINATIVE) {
+    count = parseInt(count);
+    if (isNaN(count))
+        throw new Exception("Count is not integer");
+
+    if (!I18N[lang])
+        lang = 'ru';
+    var CONFIG = I18N[lang];
+
+    if (!(forms instanceof Array)) {
+        var word = forms;
+        forms = CONFIG['UNITS'][word];
+        if (!forms)
+            throw new Exception("Unknown unit " + word);
+    }
+    if (forms.length != 2)
+        throw new Exception("Unit forms should have 2 arrays: for singular and plural");
+    if (forms[0].length != 6 || forms[1].length != 6)
+        throw new Exception("Unit forms should have 2 arrays each with 6 words for each case");
+    if (!(kase >= 0 && kase < 6))
+        throw new Exception("Case should be 0..5");
+
+    let form = getFormForNumber(count);
+    if (form == 0) {
+        return forms[0][kase];
+    } else if (form == 1) {
+        if (lang == 'ru') {
+            //...todo
+        } else if (lang == 'uk') {
+            //...todo
         }
-        count = count % 10;
-        if (1 === count) { return one; }
-        if (count >= 2 && count <= 4) { return two; }
-        return five;
+    } else if (form == 2) {
+        //...todo
     }
 
-    numeralize.pluralize = pluralize;
+}
 
-    numeralize.genders = genders;
-    for(let k in genders) {
-        numeralize[k] = genders[k];
-    }
+numeralize.pluralizeUnit = pluralizeUnit;
+numeralize.inclineUnit = inclineUnit;
+numeralize.getFormForNumber = getFormForNumber;
 
-    numeralize.kases = kases;
-    for(let k in kases) {
-        numeralize[k] = kases[k];
-    }
+numeralize.genders = genders;
+for(let k in genders) {
+    numeralize[k] = genders[k];
+}
 
-    var I18N = {};
+numeralize.kases = kases;
+for(let k in kases) {
+    numeralize[k] = kases[k];
+}
 
-    //-------------------------------------- ru
+export default numeralize;
 
-    I18N.ru = {};
-    I18N.ru.MINORS = [
-        ['ноль', 'нуля', 'нулю', 'ноль', 'нулём', 'нуле'],
-        [
-            ['один', 'одна', 'одно'],
-            ['одного', 'одной', 'одного'],
-            ['одному', 'одной', 'одному'],
-            [['одного', 'один'], 'одну', 'одно'], 
-            ['одним', 'одной', 'одним'],
-            ['одном', 'одной', 'одном']
-        ],
-        [
-            ['два', 'две', 'два'],
-            'двух',
-            'двум',
-            [['двух', 'два'], ['двух', 'две'], 'два'],
-            'двумя',
-            'двух'
-        ],
-        [
-            'три',
-            'трёх',
-            'трём',
-            [['трёх', 'три'], ['трёх', 'три'], 'три'],
-            'тремя',
-            'трёх'
-        ],
-        [
-            'четыре',
-            'четырёх',
-            'четырём',
-            [['четырёх', 'четыре'], ['четырёх', 'четыре'], 'четыре'],
-            'четырьмя',
-            'четырёх'
-        ],
-        ['пять', 'пяти', 'пяти', 'пять', 'пятью', 'пяти'],
-        ['шесть', 'шести', 'шести', 'шесть', 'шестью', 'шести'],
-        ['семь', 'семи', 'семи', 'семь', 'семью', 'семи'],
-        ['восемь', 'восьми', 'восьми', 'восемь', 'восемью', 'восьми'],
-        ['девять', 'девяти', 'девяти', 'девять', 'девятью', 'девяти'],
-        ['десять', 'десяти', 'десяти', 'десять', 'десятью', 'десяти']
-    ].concat(
-        ['один', 'две', 'три', 'четыр', 'пят', 'шест', 'сем', 'восем', 'девят'].map(function(prefix) {
-            return ['надцать', 'надцати', 'надцати', 'надцать', 'надцатью', 'надцати'].map(function(suffix) {
-                return prefix + suffix;
-            });
-        })
-    );
-
-    I18N.ru.TENS = [
-        false,
-        false,
-        ['двадцать', 'двадцати', 'двадцати', 'двадцать', 'двадцатью', 'двадцати'],
-        ['тридцать', 'тридцати', 'тридцати', 'тридцать', 'тридцатью', 'тридцати'],
-        ['сорок', 'сорока', 'сорока', 'сорок', 'сорока', 'сорока'],
-        ['пятьдесят', 'пятидесяти', 'пятидесяти', 'пятьдесят', 'пятьюдесятью', 'пятидесяти'],
-        ['шестьдесят', 'шестидесяти', 'шестидесяти', 'шестьдесят', 'шестьюдесятью', 'шестидесяти'],
-        ['семьдесят', 'семидесяти', 'семидесяти', 'семьдесят', 'семьюдесятью', 'семидесяти'],
-        ['восемьдесят', 'восьмидесяти', 'восьмидесяти', 'восемьдесят', 'восемьюдесятью', 'восьмидесяти'],
-        ['девяносто', 'девяноста', 'девяноста', 'девяносто', 'девяноста', 'девяноста']
-    ];
-
-    I18N.ru.HUNDREDS = [
-        false,
-        ['сто', 'ста', 'ста', 'сто', 'ста', 'ста'],
-        ['двести', 'двухсот', 'двумстам', 'двести', 'двумястами', 'двухстах'],
-        ['триста', 'трёхсот', 'трёмстам', 'триста', 'тремястами', 'трёхстах'],
-        ['четыреста', 'четырёхсот', 'четырёмстам', 'четыреста', 'четырьмястами', 'четырёхстах'],
-        ['пятьсот', 'пятисот', 'пятистам', 'пятьсот', 'пятьюстами', 'пятистах'],
-        ['шестьсот', 'шестисот', 'шестистам', 'шестьсот', 'шестьюстами', 'шестистах'],
-        ['семьсот', 'семисот', 'семистам', 'семьсот', 'семьюстами', 'семистах'],
-        ['восемьсот', 'восьмисот', 'восьмистам', 'восемьсот', 'восемьюстами', 'восьмистах'],
-        ['девятьсот', 'девятисот', 'девятистам', 'девятьсот', 'девятьюстами', 'девятистах']
-    ];
-
-    I18N.ru.LARGES = [
-        false,
-        [
-            numeralize.GENDER_FEMININE,
-            ['тысяча', 'тысячи', 'тысяч'],
-            ['тысячи', 'тысяч', 'тысяч'],
-            ['тысяче', 'тысячам', 'тысячам'],
-            ['тысячу', 'тысячи', 'тысяч'],
-            ['тысячей', 'тысячами', 'тысячами'],
-            ['тысяче', 'тысячах', 'тысячах']
-        ]
-    ].concat(['миллион', 'миллиард', 'триллион'].map(function(base) {
-        return [numeralize.GENDER_MASCULINE]
-            .concat([
-                ['', 'а', 'ов'],
-                ['а', 'ов', 'ов'],
-                ['у', 'ам', 'ам'],
-                ['', 'а', 'ов'],
-                ['ом', 'ами', 'ами'],
-                ['е', 'ах', 'ах']
-            ].map(function(kase) {
-                return kase.map(function(suffix) {
-                    return base + suffix;
-                });
-            }));
-    }));
-
-    //-------------------------------------- uk
-
-    //http://www.slovnyk.ua
-    I18N.uk = {};
-    I18N.uk.MINORS = [
-        ['нуль', 'нуля', 'нулю', 'нуль', 'нулем', 'нулі'],
-        [
-            ['один', 'одна', ['одно', 'одне']],
-            ['одного', ['одної', 'однієї'], 'одного'],
-            ['одному', 'одній', 'одному'],
-            ['один', 'одну', 'одне'],
-            ['одним', ['одною', 'однією'], 'одним'],
-            [['однім', 'одному'], 'одній', ['однім', 'одному']],
-        ],
-        [
-            ['два', 'дві', 'два'],
-            'двох',
-            'двом',
-            [['двох', 'два'], ['двох', 'дві'], 'два'],
-            'двома',
-            'двох',
-        ],
-        [
-            'три',
-            'трьох',
-            'трьом',
-            [['трьох', 'три'], ['трьох', 'три'], 'три'],
-            'трьома',
-            'трьох',
-        ],
-        [
-            'чотири',
-            'чотирьох',
-            'чотирьом',
-            [['чотирьох', 'чотири'], ['чотирьох', 'чотири'], 'чотири'],
-            'чотирма',
-            'чотирьох',
-        ],
-        [
-            "п'ять", 
-            [["п'ятьох", "п'яти"], ["п'ятьох", "п'яти"], "п'яти"], 
-            [["п'ятьом", "п'яти"], ["п'ятьом", "п'яти"], "п'яти"], 
-            [["п'ятьох", "п'ять"], ["п'ятьох", "п'ять"], "п'ять"], 
-            [["п'ятьома", "п'ятьма"], ["п'ятьома", "п'ятьма"], "п'ятьма"], 
-            [["п'ятьох", "п'яти"], ["п'ятьох", "п'яти"], "п'яти"], 
-        ],
-        [
-            'шість',
-            [['шістьох', 'шести'], ['шістьох', 'шести'], 'шести'],
-            [['шістьом', 'шести'], ['шістьом', 'шести'], 'шести'],
-            [['шістьох', 'шість'], ['шістьох', 'шість'], 'шість'],
-            [['шістьома', 'шістьма'], ['шістьома', 'шістьма'], 'шістьма'],
-            [['шістьох', 'шести'], ['шістьох', 'шести'], 'шести'],
-        ],
-        [
-            'сім',
-            [['сімох', 'семи'], ['сімох', 'семи'], 'семи'],
-            [['сімом', 'семи'], ['сімом', 'семи'], 'семи'],
-            [['сімох', 'сім'], ['сімох', 'сім'], 'сім'],
-            [['сімома', 'сьома'], ['сімома', 'сьома'], 'сьома'],
-            [['сімох', 'семи'], ['сімох', 'семи'], 'семи'],
-        ],
-        [
-            'вісім',
-            [['вісьмох', 'восьми'], ['вісьмох', 'восьми'], 'восьми'],
-            [['вісьмом', 'восьми'], ['вісьмом', 'восьми'], 'восьми'],
-            [['вісьмох', 'вісім'], ['вісьмох', 'вісім'], 'вісім'],
-            [['вісьмома', 'вісьма'], ['вісьмома', 'вісьма'], 'вісьма'],
-            [['вісьмох', 'восьми'], ['вісьмох', 'восьми'], 'восьми'],
-        ],
-        [
-            "дев'ять",
-            [["дев'ятьох", "дев'яти"], ["дев'ятьох", "дев'яти"], "дев'яти"],
-            [["дев'ятьом", "дев'яти"], ["дев'ятьом", "дев'яти"], "дев'яти"],
-            [["дев'ятьох", "дев'ять"], ["дев'ятьох", "дев'ять"], "дев'ять"],
-            [["дев'ятьома", "дев'ятьма"], ["дев'ятьома", "дев'ятьма"], "дев'ятьма"],
-            [["дев'ятьох", "дев'яти"], ["дев'ятьох", "дев'яти"], "дев'яти"],
-        ],
-        [
-            'десять',
-            [['десятьох', 'десяти'], ['десятьох', 'десяти'], 'десяти'],
-            [['десятьом', 'десяти'], ['десятьом', 'десяти'], 'десяти'],
-            [['десятьох', 'десять'], ['десятьох', 'десять'], 'десять'],
-            [['десятьома', 'десятьма'], ['десятьома', 'десятьма'], 'десятьма'],
-            [['десятьох', 'десяти'], ['десятьох', 'десяти'], 'десяти'],
-        ],
-    ].concat(
-        ['оди', 'два', 'три', 'чотир', "п'ят", 'шіст', 'сім', 'вісім', "дев'ят"].map(function(p) {
-            return [
-                p+'надцять', 
-                [[p+'надцятьох', p+'надцяти'], [p+'надцятьох', p+'надцяти'], p+'надцяти'],
-                [[p+'надцятьом', p+'надцяти'], [p+'надцятьом', p+'надцяти'], p+'надцяти'],
-                [[p+'надцятьох', p+'надцять'], [p+'надцятьох', p+'надцять'], p+'надцять'],
-                [[p+'надцятьома', p+'надцятьма'], [p+'надцятьома', p+'надцятьма'], p+'надцятьма'],
-                [[p+'надцятьох', p+'надцяти'], [p+'надцятьох', p+'надцяти'], p+'надцяти'],
-            ];
-        })
-    );
-
-    I18N.uk.TENS = [
-        false,
-        false,
-    ].concat(
-        ['два', 'три'].map(function(p) {
-            return [
-                p+'дцять',
-                [p+'дцятьох', p+'дцяти'],
-                [p+'дцятьом', p+'дцяти'],
-                [p+'дцятьох', p+'дцять'],
-                [p+'дцятьома', p+'дцятьма'],
-                [p+'дцятьох', p+'дцяти'],
-            ];
-        })
-    ).concat([[
-        'сорок',
-        'сорока',
-        'сорока',
-        ['сорока', 'сорок'],
-        'сорока',
-        'сорока',
-    ]]).concat(
-        ["п'ят", 'шіст', 'сім', 'вісім', "дев'ят"].map(function(p) {
-            return [
-                p+'десят',
-                [p+'десятьох', p+'десяти'],
-                [p+'десятьом', p+'десяти'],
-                [p+'десятьох', p+'десят'],
-                [p+'десятьома', p+'десятьма'],
-                [p+'десятьох', p+'десяти'],
-            ];
-        })
-    );
-
-    I18N.uk.HUNDREDS = [
-        false,
-        ['сто', 'ста', 'ста', 'сто', 'ста', 'ста'],
-        ['двісті', 'двохсот', 'двомстам', ['двохсот', 'двісті'], 'двомастами', 'двохстах'],
-        ['триста', 'трьохсот', 'трьомстам', ['трьохсот', 'триста'], 'трьомастами', 'трьохсот'],
-        ['чотириста', 'чотирьохсот', 'чотирьомстам', ['чотирьохсот', 'чотириста'], 'чотирмастами', 'чотирьохсот'],
-        ["п'ятсот", "п'ятисот", "п'ятистам", "п'ятсот", ["п'ятьомастами", "п'ятьмастами"], "п'ятистах"],
-        ['шістсот', 'шестисот', 'шестистам', 'шістсот', ['шістьомастами', 'шістьмастами'], 'шестистах'],
-        ['сімсот', 'семисот', 'семистам', 'сімсот', ['сьомастами', 'сімомастами'], 'семистах'],
-        ['вісімсот', 'восьмисот', 'восьмистам', 'вісімсот', ['вісьмомастами', 'вісьмастами'], 'восьмистах'],
-        ["дев'ятсот", "дев'ятисот", "дев'ятистам", "дев'ятсот", ["дев'ятьомастами", "дев'ятьмастами"], "дев'ятистах"],
-    ];
-
-    I18N.uk.LARGES = [
-        false,
-        [
-            numeralize.GENDER_FEMININE,
-            ['тисяча', 'тисячі', 'тисяч'],
-            ['тисячі', 'тисяч', 'тисяч'],
-            ['тисячі', 'тисячам', 'тисячам'],
-            ['тисячу', 'тисячі', 'тисяч'],
-            ['тисячею', 'тисячами', 'тисячами'],
-            ['тисячі', 'тисячах', 'тисячах']
-        ]
-    ].concat(['мільйон', 'мільярд', 'трильйон'].map(function(base) {
-        return [numeralize.GENDER_MASCULINE]
-            .concat([
-                ['', 'и', 'ів'],
-                ['а', 'ів', 'ів'],
-                ['у', 'ам', 'ам'],
-                ['', 'и', 'и'],
-                ['ом', 'ами', 'ами'],
-                ['і', 'ах', 'ах']
-            ].map(function(kase) {
-                return kase.map(function(suffix) {
-                    return base + suffix;
-                });
-            }));
-    }));
-
-    return numeralize;
-}));
