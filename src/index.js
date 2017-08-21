@@ -1,20 +1,7 @@
 'use strict';
 
-import I18N from './i18n/ubdex.js';
-
-var genders = {
-    'GENDER_MASCULINE': 0,
-    'GENDER_FEMININE': 1,
-    'GENDER_NEUTER': 2,
-};
-var kases = {
-    'CASE_NOMINATIVE': 0,
-    'CASE_GENITIVE': 1,
-    'CASE_DATIVE': 2,
-    'CASE_ACCUSATIVE': 3,
-    'CASE_INSTRUMENTAL': 4,
-    'CASE_PREPOSITIONAL': 5,
-};
+import I18N from './i18n/index.js';
+import {genders, kases} from './constants.js';
 
 /**
  * Numeralize number
@@ -25,11 +12,17 @@ var kases = {
  * @param {boolean} [animate=false]
  * @returns {string}
  */
-function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase = kase.CASE_NOMINATIVE, animate = false) {
+function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase = kases.CASE_NOMINATIVE, animate = false) {
     // Normalize params
     number = Math.abs(parseInt(number, 10));
+    if (isNaN(number))
+        throw new Exception("number is not integer");
     gender = gender || numeralize.GENDER_MASCULINE;
+    if (!(gender >= 0 && gender < 3))
+        throw new Exception("gender should be 0..2");
     kase = kase || numeralize.CASE_NOMINATIVE;
+    if (!(kase >= 0 && kase < 6))
+        throw new Exception("kase should be 0..5");
     animate = !!animate;
     if (!I18N[lang])
         lang = 'ru';
@@ -50,7 +43,7 @@ function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase
             if (numeral) {
                 result.push(numeral);
                 if (words) {
-                    var plural = pluralize.apply(null, [current].concat(words[kase + 1]));
+                    var plural = pluralize(current, words[kase + 1]);
                     result.push(plural);
                 }
             }
@@ -130,19 +123,29 @@ function small(number, lang, gender, kase, animate) {
 /**
  * Pluralize noun (unit) according to count
  * @param {number} count Number of items
- * @param {array} 3 forms, e.g. ['рубль', 'рубля', 'рублей']
+ * @param {array} forms 3 forms of noun, e.g. ['рубль', 'рубля', 'рублей']
  * @returns {string}
  */
-function pluralizeUnit(count, forms) {
+function pluralize(count, forms) {
+    count = parseInt(count);
+    if (isNaN(count))
+        throw new Exception("count is not integer");
+    if (!(forms instanceof Array) || forms.length != 3)
+        throw new Exception("forms should be array of 3 words");
+
     return forms[getFormForNumber(count)];
 }
 
 /**
- * Get 1 of 3 forms depending on count
+ * Get 1 of 3 forms for noun depending on count
  * @param {number} count Number of items
  * @returns {number} 0/1/2
  */
 function getFormForNumber(count) {
+    count = parseInt(count);
+    if (isNaN(count))
+        throw new Exception("count is not integer");
+
     count = Math.floor(Math.abs(count)) % 100;
     if (count > 10 && count < 20) {
         return 2;
@@ -154,20 +157,22 @@ function getFormForNumber(count) {
 }
 
 /**
- * Incline noun according to count
+ * Incline noun (unit) according to count
  * @param {number} count Number of items
- * @param {array} forms [[6 words for every case in singular], [6 words for every case in plural]]
+ * @param {string/array} forms known unit (see UNITS at i18n) -or- forms of noun: [[6 words for every case in singular], [6 words for every case in plural]]
  * @param {string} lang 'ru'/'uk'
  * @param {number} kase
  * @returns {string}
  */
-function inclineUnit(count, forms, lang = 'ru', kase = kase.CASE_NOMINATIVE) {
+function inclineUnit(count, forms, lang = 'ru', kase = kases.CASE_NOMINATIVE) {
+    // Normalize params
     count = parseInt(count);
     if (isNaN(count))
-        throw new Exception("Count is not integer");
-
+        throw new Exception("count is not integer");
     if (!I18N[lang])
         lang = 'ru';
+    if (!(kase >= 0 && kase < 6))
+        throw new Exception("kase should be 0..5");
     var CONFIG = I18N[lang];
 
     if (!(forms instanceof Array)) {
@@ -180,25 +185,27 @@ function inclineUnit(count, forms, lang = 'ru', kase = kase.CASE_NOMINATIVE) {
         throw new Exception("Unit forms should have 2 arrays: for singular and plural");
     if (forms[0].length != 6 || forms[1].length != 6)
         throw new Exception("Unit forms should have 2 arrays each with 6 words for each case");
-    if (!(kase >= 0 && kase < 6))
-        throw new Exception("Case should be 0..5");
 
     let form = getFormForNumber(count);
     if (form == 0) {
         return forms[0][kase];
-    } else if (form == 1) {
+    } else if (form == 1 || form == 2) {
         if (lang == 'ru') {
-            //...todo
+            if (kase == kases.CASE_NOMINATIVE || kase == kases.CASE_ACCUSATIVE)
+                return forms[form == 1 ? 0 : 1][kases.CASE_GENITIVE];
+            else
+                return forms[1][kase];
         } else if (lang == 'uk') {
-            //...todo
+            if (kase == kases.CASE_NOMINATIVE || kase == kases.CASE_ACCUSATIVE)
+                return forms[1][form == 1 ? kases.CASE_NOMINATIVE : kases.CASE_GENITIVE];
+            else
+                return forms[1][kase];
         }
-    } else if (form == 2) {
-        //...todo
     }
-
+    return null;
 }
 
-numeralize.pluralizeUnit = pluralizeUnit;
+numeralize.pluralize = pluralize;
 numeralize.inclineUnit = inclineUnit;
 numeralize.getFormForNumber = getFormForNumber;
 

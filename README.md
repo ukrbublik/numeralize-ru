@@ -10,7 +10,7 @@ npm install --save numeralize-rus-ukr
 
 # API
 
-### `numeralize(number, [lang, [gender, [kase, [animate]]]])`
+### `numeralize(number, lang = 'ru', gender = numeralize.GENDER_MASCULINE, kase = numeralize.CASE_NOMINATIVE, animate = false)`
 
 Возвращает числительное, соответствующее числу
 
@@ -65,7 +65,7 @@ numeralize(5122981121, 'ru', numeralize.GENDER_MASCULINE, numeralize.CASE_PREPOS
 // мужской род, творительный падеж, 'пяти миллиардах ста двадцати двух миллионах девятистах восьмидесяти одной тысяче ста двадцати одном'
 ```
 
-###  `numeralize.pluralizeUnit(count, forms)`
+###  `numeralize.pluralize(count, forms)`
 
 Выбирает нужную форму существительного в зависимости от количества.
 
@@ -73,26 +73,58 @@ numeralize(5122981121, 'ru', numeralize.GENDER_MASCULINE, numeralize.CASE_PREPOS
 + `forms` — 3 формы существительного для одного/двух/пяти предмета, например, [_рубль_, _рубля_, _рублей_];
 
 ```javascript
-const pluralizeUnit = require('numeralize').pluralizeUnit;
+const pluralize = require('numeralize').pluralize;
 
-pluralizeUnit(0, ['рубль', 'рубля', 'рублей']);
+pluralize(0, ['рубль', 'рубля', 'рублей']);
 // 'рублей'
 
-pluralizeUnit(1, ['рубль', 'рубля', 'рублей']);
+pluralize(1, ['рубль', 'рубля', 'рублей']);
 // 'рубль'
 
-pluralizeUnit(2, ['рубль', 'рубля', 'рублей']);
+pluralize(2, ['рубль', 'рубля', 'рублей']);
 // 'рубля'
 
-pluralizeUnit(5, ['рубль', 'рубля', 'рублей']);
+pluralize(5, ['рубль', 'рубля', 'рублей']);
 // 'рублей'
 
-pluralizeUnit(11, ['рубль', 'рубля', 'рублей']);
+pluralize(11, ['рубль', 'рубля', 'рублей']);
 // 'рублей'
 
-pluralizeUnit(21, ['рубль', 'рубля', 'рублей']);
+pluralize(21, ['рубль', 'рубля', 'рублей']);
 // 'рубль'
 
+```
+
+###  `numeralize.inclineUnit(count, forms, lang = 'ru', kase = numeralize.CASE_NOMINATIVE)`
+
+Склоняет существительное (ед.изм., например, деньги) в зависимости от количества.
+
++ `count` — количество
++ `forms` — двуменрный массив 2x6 из 6 форм существительного для ед.ч. и мн.ч. -или- одна из известных единиц измерения, см. ниже `UNITS`;
++ `kase` — падеж
+
+#### `UNITS`
++ ru
+    + рубль
+    + гривна
+    + копейка
+    + доллар
+    + цент
++ uk
+    + рубль
+    + гривня
+    + копійка
+    + долар
+    + цент
+
+```javascript
+const inclineUnit = require('numeralize').inclineUnit;
+
+inclineUnit(2, 'рубль', 'ru');
+// 'рубля'
+
+inclineUnit(2, 'рубль', 'ru', numeralize.CASE_GENITIVE);
+// 'рублей'
 ```
 
 

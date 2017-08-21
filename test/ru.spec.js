@@ -1,9 +1,9 @@
 const assert = require('assert');
-const numeralize = require('../index');
+const numeralize = require('../build/index.js').default;
 
 describe('numeralize (ru)', () => {
     'use strict';
-
+    
     const tests = [
         ['0 to 19 (minors)',
             [1,
@@ -1076,4 +1076,39 @@ describe('numeralize (ru)', () => {
         });
     });
 
+});
+
+
+
+describe('numeralize.inclineUnit (ru)', () => {
+    'use strict';
+
+    const testsUnits = {
+        'гривна': [
+            [2, 'CASE_NOMINATIVE', "2 гривны"],
+            [5, 'CASE_NOMINATIVE', "5 гривен"],
+            [2, 'CASE_GENITIVE', "2 гривен"],
+            [5, 'CASE_GENITIVE', "5 гривен"],
+        ],
+        'доллар': [
+            [1, 'CASE_NOMINATIVE', "1 доллар"],
+            [2, 'CASE_NOMINATIVE', "2 доллара"],
+            [5, 'CASE_NOMINATIVE', "5 долларов"],
+            [1, 'CASE_GENITIVE', "1 доллара"],
+        ],
+    };
+    Object.keys(testsUnits).map(unit => {
+        let tests = testsUnits[unit];
+        tests.map(test => {
+            let count = test[0];
+            let kase = test[1];
+            let expected = test[2];
+            it(`(${count}, ${unit}, ${kase}) → ${expected}`, () => {
+                assert.strictEqual(
+                    count + " " + numeralize.inclineUnit(count, unit, 'ru', numeralize[kase]),
+                    expected
+                );
+            });
+        });
+    });
 });

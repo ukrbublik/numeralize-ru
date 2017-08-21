@@ -1,13 +1,11 @@
 {
   "name": "numeralize-rus-ukr",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Converts a number to words for Russian/Ukrainian languages. Написание числительных на русском и украинском языке с учётом пола и падежа.",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "npm run test:js; npm run test:ts",
-    "test:js": "./node_modules/.bin/mocha",
-    "test:ts": "./node_modules/.bin/tsc ./test/*.d.spec.ts --noEmit --noImplicitAny --strictNullChecks --target ES6",
-    "dev": "./node_modules/.bin/mocha --watch"
+    "build": "babel src --presets babel-preset-es2015 --out-dir build",
+    "test": "npm run build && ./node_modules/.bin/mocha"
   },
   "keywords": [
     "russian",
@@ -27,8 +25,11 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^2.4.5",
-    "typescript": "^2.0.10"
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "mocha": "^2.4.5"
   },
   "repository": {
     "type": "git",
