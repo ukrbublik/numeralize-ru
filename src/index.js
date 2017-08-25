@@ -16,13 +16,13 @@ function numeralize(number, lang = 'ru', gender = genders.GENDER_MASCULINE, kase
     // Normalize params
     number = Math.abs(parseInt(number, 10));
     if (isNaN(number))
-        throw new Exception("number is not integer");
+        throw new Error("number is not integer");
     gender = gender || numeralize.GENDER_MASCULINE;
     if (!(gender >= 0 && gender < 3))
-        throw new Exception("gender should be 0..2");
+        throw new Error("gender should be 0..2");
     kase = kase || numeralize.CASE_NOMINATIVE;
     if (!(kase >= 0 && kase < 6))
-        throw new Exception("kase should be 0..5");
+        throw new Error("kase should be 0..5");
     animate = !!animate;
     if (!I18N[lang])
         lang = 'ru';
@@ -129,9 +129,9 @@ function small(number, lang, gender, kase, animate) {
 function pluralize(count, forms) {
     count = parseInt(count);
     if (isNaN(count))
-        throw new Exception("count is not integer");
+        throw new Error("count is not integer");
     if (!(forms instanceof Array) || forms.length != 3)
-        throw new Exception("forms should be array of 3 words");
+        throw new Error("forms should be array of 3 words");
 
     return forms[getFormForNumber(count)];
 }
@@ -144,7 +144,7 @@ function pluralize(count, forms) {
 function getFormForNumber(count) {
     count = parseInt(count);
     if (isNaN(count))
-        throw new Exception("count is not integer");
+        throw new Error("count is not integer");
 
     count = Math.floor(Math.abs(count)) % 100;
     if (count > 10 && count < 20) {
@@ -168,23 +168,23 @@ function inclineUnit(count, forms, lang = 'ru', kase = kases.CASE_NOMINATIVE) {
     // Normalize params
     count = parseInt(count);
     if (isNaN(count))
-        throw new Exception("count is not integer");
+        throw new Error("count is not integer");
     if (!I18N[lang])
         lang = 'ru';
     if (!(kase >= 0 && kase < 6))
-        throw new Exception("kase should be 0..5");
+        throw new Error("kase should be 0..5");
     var CONFIG = I18N[lang];
 
     if (!(forms instanceof Array)) {
         var word = forms;
         forms = CONFIG['UNITS'][word];
         if (!forms)
-            throw new Exception("Unknown unit " + word);
+            throw new Error("Unknown unit " + word);
     }
     if (forms.length != 2)
-        throw new Exception("Unit forms should have 2 arrays: for singular and plural");
+        throw new Error("Unit forms should have 2 arrays: for singular and plural");
     if (forms[0].length != 6 || forms[1].length != 6)
-        throw new Exception("Unit forms should have 2 arrays each with 6 words for each case");
+        throw new Error("Unit forms should have 2 arrays each with 6 words for each case");
 
     let form = getFormForNumber(count);
     if (form == 0) {
