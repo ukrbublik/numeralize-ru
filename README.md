@@ -1,5 +1,7 @@
 # numeralize-rus-ukr
 
+![version](https://img.shields.io/npm/v/numeralize-rus-ukr.svg?style=flat&label=version) ![travis](https://img.shields.io/travis/ukrbublik/numeralize-rus-ukr.svg?style=flat)
+
 Написание числительных на русском и украинском языке с учётом пола и падежа.
 
 # Установка
