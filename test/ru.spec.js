@@ -1090,11 +1090,14 @@ describe('numeralize.inclineUnit (ru)', () => {
             [2, 'CASE_GENITIVE', "2 гривен"],
             [5, 'CASE_GENITIVE', "5 гривен"],
         ],
+        'доллар США': [
+            [1, 'CASE_NOMINATIVE', "1 доллар США"],
+            [2, 'CASE_NOMINATIVE', "2 доллара США"],
+            [5, 'CASE_NOMINATIVE', "5 долларов США"],
+            [1, 'CASE_GENITIVE', "1 доллара США"],
+        ],
         'доллар': [
             [1, 'CASE_NOMINATIVE', "1 доллар"],
-            [2, 'CASE_NOMINATIVE', "2 доллара"],
-            [5, 'CASE_NOMINATIVE', "5 долларов"],
-            [1, 'CASE_GENITIVE', "1 доллара"],
         ],
     };
     Object.keys(testsUnits).map(unit => {
