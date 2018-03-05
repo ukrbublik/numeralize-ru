@@ -60,8 +60,11 @@ describe('numeralize.inclineUnit (uk)', () => {
 
     const testsUnits = {
         'гривня': [
+            [1, 'CASE_NOMINATIVE', "1 гривня"],
             [2, 'CASE_NOMINATIVE', "2 гривні"],
             [5, 'CASE_NOMINATIVE', "5 гривень"],
+            [41, 'CASE_NOMINATIVE', "41 гривня"],
+            [42, 'CASE_NOMINATIVE', "42 гривні"],
             [2, 'CASE_GENITIVE', "2 гривень"],
             [5, 'CASE_GENITIVE', "5 гривень"],
         ],
