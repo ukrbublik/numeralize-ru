@@ -1,6 +1,6 @@
 {
   "name": "numeralize-rus-ukr",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Converts a number to words for Russian/Ukrainian languages. Написание числительных на русском и украинском языке с учётом пола и падежа.",
   "main": "build/index.js",
   "scripts": {
